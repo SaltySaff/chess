@@ -2,7 +2,7 @@
 
 # creates/controls chess pieces
 class Piece
-  attr_reader :moveset, :icon
+  attr_reader :piece_type, :moveset, :icon, :position
 
   def initialize(piece_type, color, position)
     @piece_type = piece_type
