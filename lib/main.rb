@@ -6,8 +6,5 @@ require_relative '../lib/board'
 require_relative '../lib/game'
 require_relative '../lib/piece'
 
-rook = Piece.new('rook', 'white')
-p rook.icon
-
-# board = Board.new
-# board.display
+board = Board.new
+p board.populate_pawns([1, 0])

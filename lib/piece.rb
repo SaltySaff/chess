@@ -4,12 +4,12 @@
 class Piece
   attr_reader :moveset, :icon
 
-  def initialize(piece_type, color)
+  def initialize(piece_type, color, position)
     @piece_type = piece_type
     @color = color
     @moveset = get_moveset(piece_type)
     @active = true
-    @position = nil
+    @position = position
     @icon = get_icon(piece_type, color)
   end
 
@@ -48,5 +48,21 @@ class Piece
       'queen' => { 'black' => "\u{2655}", 'white' => "\u{265B}" }
     }
     icons[piece_type][color]
+  end
+
+  def get_location(piece_type, color)
+    locations = {
+      'pawn' => { 'black' => calc_location([6, 0], 8), 'white' => calc_location([1, 0], 8) },
+      'knight' => { 'black' => "\u{2658}", 'white' => "\u{265E}" },
+      'king' => { 'black' => "\u{2654}", 'white' => "\u{265A}" },
+      'rook' => { 'black' => "\u{2656}", 'white' => "\u{265C}" },
+      'bishop' => { 'black' => "\u{2657}", 'white' => "\u{265D}" },
+      'queen' => { 'black' => "\u{2655}", 'white' => "\u{265B}" }
+    }
+    locations[piece_type][color]
+  end
+
+  def calc_location(default_location, count)
+
   end
 end
