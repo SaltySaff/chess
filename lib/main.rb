@@ -6,8 +6,8 @@ require_relative '../lib/board'
 require_relative '../lib/game'
 require_relative '../lib/piece'
 
-# rook = Piece.new('queen', 'black')
-# p rook.moveset
+rook = Piece.new('rook', 'white')
+p rook.icon
 
-board = Board.new
-board.display
+# board = Board.new
+# board.display

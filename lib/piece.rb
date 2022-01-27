@@ -2,7 +2,7 @@
 
 # creates/controls chess pieces
 class Piece
-  attr_reader :moveset
+  attr_reader :moveset, :icon
 
   def initialize(piece_type, color)
     @piece_type = piece_type
@@ -10,6 +10,7 @@ class Piece
     @moveset = get_moveset(piece_type)
     @active = true
     @position = nil
+    @icon = get_icon(piece_type, color)
   end
 
   def get_moveset(piece_type)
@@ -35,5 +36,17 @@ class Piece
       end
     end
     generated_moveset
+  end
+
+  def get_icon(piece_type, color)
+    icons = {
+      'pawn' => { 'black' => "\u{2659}", 'white' => "\u{265F}" },
+      'knight' => { 'black' => "\u{2658}", 'white' => "\u{265E}" },
+      'king' => { 'black' => "\u{2654}", 'white' => "\u{265A}" },
+      'rook' => { 'black' => "\u{2656}", 'white' => "\u{265C}" },
+      'bishop' => { 'black' => "\u{2657}", 'white' => "\u{265D}" },
+      'queen' => { 'black' => "\u{2655}", 'white' => "\u{265B}" }
+    }
+    icons[piece_type][color]
   end
 end
