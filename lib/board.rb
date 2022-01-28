@@ -63,4 +63,14 @@ class Board
     end
     locations
   end
+
+  def move_piece(start_pos, end_pos)
+    return nil if start_pos.nil? || !valid_move(start_pos, end_pos)
+
+    @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
+    @board_cells[start_pos[0]][start_pos[1]] = ' '
+  end
+
+  def valid_move(start_pos, end_pos)
+  end
 end

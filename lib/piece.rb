@@ -61,8 +61,4 @@ class Piece
     }
     locations[piece_type][color]
   end
-
-  def calc_location(default_location, count)
-
-  end
 end
