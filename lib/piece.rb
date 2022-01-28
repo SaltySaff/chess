@@ -31,7 +31,7 @@ class Piece
     move_array.each do |move|
       count = 1
       7.times do
-        generated_moveset << [[move[0] * count, move[1] * count]]
+        generated_moveset << [move[0] * count, move[1] * count]
         count += 1
       end
     end

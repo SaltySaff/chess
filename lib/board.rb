@@ -12,11 +12,24 @@ class Board
     puts '  +---+---+---+---+---+---+---+---+'.light_blue
     n = 8
     while n >= 1
-      puts "#{n.to_s.green} #{'|'.blue} #{@board_cells[n - 1].join(' | '.light_blue)} #{'|'.light_blue}"
+      puts "#{n.to_s.green} #{'|'.blue} #{cells_to_icons(@board_cells)[n - 1].join(' | '.light_blue)} #{'|'.light_blue}"
       puts '  +---+---+---+---+---+---+---+---+'.light_blue
       n -= 1
     end
     puts '    a   b   c   d   e   f   g   h'.green
+  end
+
+  def cells_to_icons(cells_array)
+    cells_array.map do |row|
+      row.map do |cell|
+        case cell
+        when ' '
+          ' '
+        else
+          cell.icon
+        end
+      end
+    end
   end
 
   def generate_pieces
@@ -39,7 +52,7 @@ class Board
 
   def place_pieces
     @active_pieces.each do |piece|
-      @board_cells[piece.position[0]][piece.position[1]] = piece.icon
+      @board_cells[piece.position[0]][piece.position[1]] = piece
     end
   end
 
@@ -65,12 +78,43 @@ class Board
   end
 
   def move_piece(start_pos, end_pos)
-    return nil if start_pos.nil? || !valid_move(start_pos, end_pos)
+    return nil unless !valid_move(start_pos, end_pos)
 
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
   end
 
   def valid_move(start_pos, end_pos)
+    return nil if @board_cells[start_pos[0]][start_pos[1]] == ' '
+
+    possible_moves = calc_possible_moves(start_pos)
+    return true if possible_moves.include?(end_pos)
+
+    false
+  end
+
+  def calc_possible_moves(position)
+    piece = @board_cells[position[0]][position[1]]
+    possible_moves = []
+    piece.moveset.each do |move|
+      possible_moves << [position[0] + move[0], position[1] + move[1]]
+    end
+    filter_moves(possible_moves)
+  end
+
+  def filter_moves(possible_moves)
+    filtered_moves = []
+    possible_moves.each do |move|
+      filtered_moves << move if (0..7).include?(move[0]) && (0..7).include?(move[1])
+    end
+    remove_occupied(filtered_moves)
+  end
+
+  def remove_occupied(filtered_moves)
+    unoccupied = []
+    filtered_moves.each do |move|
+      unoccupied << move if @board_cells[move[0]][move[1]] == ' '
+    end
+    unoccupied
   end
 end
