@@ -9,6 +9,7 @@ class Board
   end
 
   def display
+    # displays the game board in the terminal
     puts '  +---+---+---+---+---+---+---+---+'.light_blue
     n = 8
     while n >= 1
@@ -20,6 +21,7 @@ class Board
   end
 
   def cells_to_icons(cells_array)
+    # converts the cell objects to icons for displaying in the terminal
     cells_array.map do |row|
       row.map do |cell|
         case cell
@@ -33,11 +35,13 @@ class Board
   end
 
   def generate_pieces
+    # creates all of the default chess pieces and places them on the board
     create_pieces
     place_pieces
   end
 
   def create_pieces
+    # creates the required number of chess pieces, black and white
     pieces = %w[pawn knight king rook bishop queen]
     colors = %w[black white]
     pieces.each do |piece|
@@ -51,12 +55,14 @@ class Board
   end
 
   def place_pieces
+    # places each piece in its place on the board
     @active_pieces.each do |piece|
       @board_cells[piece.position[0]][piece.position[1]] = piece
     end
   end
 
   def piece_locations
+    # stores the starting locations of each chess piece
     {
       'pawn' => { 'black' => populate_pawns([6, 0]), 'white' => populate_pawns([1, 0]) },
       'knight' => { 'black' => [[7, 1], [7, 6]], 'white' => [[0, 1], [0, 6]] },
@@ -68,6 +74,7 @@ class Board
   end
 
   def populate_pawns(initial_position)
+    # returns an array of the positions of each pawn
     locations = []
     n = 0
     while n <= 7
@@ -78,13 +85,15 @@ class Board
   end
 
   def move_piece(start_pos, end_pos)
-    return nil unless !valid_move(start_pos, end_pos)
+    # moves a piece from one board cell to another
+    return nil unless valid_move(start_pos, end_pos)
 
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
   end
 
   def valid_move(start_pos, end_pos)
+    # determines whether a given move is valid
     return nil if @board_cells[start_pos[0]][start_pos[1]] == ' '
 
     possible_moves = calc_possible_moves(start_pos)
@@ -94,6 +103,7 @@ class Board
   end
 
   def calc_possible_moves(position)
+    # calculates all possible moves for a piece from a given location
     piece = @board_cells[position[0]][position[1]]
     possible_moves = []
     piece.moveset.each do |move|
@@ -103,6 +113,7 @@ class Board
   end
 
   def filter_moves(possible_moves)
+    # filters the passed possible moves array to remove any impossible moves
     filtered_moves = []
     possible_moves.each do |move|
       filtered_moves << move if (0..7).include?(move[0]) && (0..7).include?(move[1])
@@ -111,6 +122,7 @@ class Board
   end
 
   def remove_occupied(filtered_moves)
+    # removes from the possible moves array any cells that are already occupied
     unoccupied = []
     filtered_moves.each do |move|
       unoccupied << move if @board_cells[move[0]][move[1]] == ' '

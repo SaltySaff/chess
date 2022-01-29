@@ -8,3 +8,4 @@ require_relative '../lib/piece'
 
 board = Board.new
 board.display
+
