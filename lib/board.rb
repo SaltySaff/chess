@@ -2,9 +2,12 @@
 
 # creates/modifies game board
 class Board
+  attr_reader :inactive_pieces
+
   def initialize
     @board_cells = Array.new(8) { Array.new(8, ' ') }
     @active_pieces = []
+    @inactive_pieces = []
     generate_pieces
   end
 
@@ -88,8 +91,22 @@ class Board
     # moves a piece from one board cell to another
     return nil unless valid_move(start_pos, end_pos)
 
+    capture_piece(end_pos) if occupied?(end_pos)
+
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
+  end
+
+  def occupied?(end_pos)
+    # detemines if the cell is occupied by another piece
+    return false if @board_cells[end_pos[0]][end_pos[1]] == ' '
+
+    true
+  end
+
+  def capture_piece(end_pos)
+    # captures an opposing color piece and makes it inactive
+    @inactive_pieces << @board_cells[end_pos[0]][end_pos[1]]
   end
 
   def valid_move(start_pos, end_pos)
@@ -109,23 +126,26 @@ class Board
     piece.moveset.each do |move|
       possible_moves << [position[0] + move[0], position[1] + move[1]]
     end
-    filter_moves(possible_moves)
+    filter_moves(position, possible_moves)
   end
 
-  def filter_moves(possible_moves)
+  def filter_moves(position, possible_moves)
     # filters the passed possible moves array to remove any impossible moves
     filtered_moves = []
     possible_moves.each do |move|
       filtered_moves << move if (0..7).include?(move[0]) && (0..7).include?(move[1])
     end
-    remove_occupied(filtered_moves)
+    remove_same_color(position, filtered_moves)
   end
 
-  def remove_occupied(filtered_moves)
-    # removes from the possible moves array any cells that are already occupied
+  def remove_same_color(position, filtered_moves)
+    # removes from the possible moves array any cell that is occupied by a piece of the same color
     unoccupied = []
     filtered_moves.each do |move|
       unoccupied << move if @board_cells[move[0]][move[1]] == ' '
+      next if @board_cells[move[0]][move[1]] == ' '
+
+      unoccupied << move if @board_cells[move[0]][move[1]].color != @board_cells[position[0]][position[1]].color
     end
     unoccupied
   end
