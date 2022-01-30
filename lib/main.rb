@@ -7,8 +7,9 @@ require_relative '../lib/game'
 require_relative '../lib/piece'
 
 board = Board.new
+board.move_piece([1, 4], [2, 4])
+board.move_piece([2, 4], [3, 4])
+board.move_piece([0, 4], [1, 4])
+board.move_piece([1, 4], [2, 4])
 board.display
-board.move_piece([7, 0], [1, 0])
-board.move_piece([0, 0], [1, 0])
-board.display
-p board.inactive_pieces.length
+

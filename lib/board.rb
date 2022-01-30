@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# creates/modifies game board
+# creates/modifies game board and handles game logic
 class Board
   attr_reader :inactive_pieces
 
@@ -8,6 +8,8 @@ class Board
     @board_cells = Array.new(8) { Array.new(8, ' ') }
     @active_pieces = []
     @inactive_pieces = []
+    @current_cell = nil
+    @goal_cell = nil
     generate_pieces
   end
 
@@ -89,12 +91,20 @@ class Board
 
   def move_piece(start_pos, end_pos)
     # moves a piece from one board cell to another
+    set_cells(start_pos, end_pos)
     return nil unless valid_move(start_pos, end_pos)
 
     capture_piece(end_pos) if occupied?(end_pos)
 
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
+  end
+
+  def set_cells(start_pos, end_pos)
+    # sets the current contents of starting cell and ending cell
+    # to the appropriate instance varible for purposes of DRY
+    @current_cell = @board_cells[start_pos[0]][start_pos[1]]
+    @goal_cell = @board_cells[end_pos[0]][end_pos[1]]
   end
 
   def occupied?(end_pos)
@@ -111,42 +121,51 @@ class Board
 
   def valid_move(start_pos, end_pos)
     # determines whether a given move is valid
-    return nil if @board_cells[start_pos[0]][start_pos[1]] == ' '
+    return nil if @current_cell == ' '
 
-    possible_moves = calc_possible_moves(start_pos)
+    possible_moves = calc_moves(start_pos)
     return true if possible_moves.include?(end_pos)
 
     false
   end
 
-  def calc_possible_moves(position)
-    # calculates all possible moves for a piece from a given location
-    piece = @board_cells[position[0]][position[1]]
+  def calc_moves(position)
+    # calculates all moves for a piece from a given location
     possible_moves = []
-    piece.moveset.each do |move|
-      possible_moves << [position[0] + move[0], position[1] + move[1]]
+    @current_cell.moveset.each do |direction|
+      direction_array = []
+      direction.each do |move|
+        direction_array << [position[0] + move[0], position[1] + move[1]]
+      end
+      possible_moves << direction_array
     end
-    filter_moves(position, possible_moves)
+    filter_moves(possible_moves)
   end
 
-  def filter_moves(position, possible_moves)
-    # filters the passed possible moves array to remove any impossible moves
+  def filter_moves(possible_moves)
+    wremove_off_board(remove_blocked_moves(possible_moves))
+  end
+
+  def remove_off_board(possible_moves)
+    # removes any moves that go off board
     filtered_moves = []
     possible_moves.each do |move|
       filtered_moves << move if (0..7).include?(move[0]) && (0..7).include?(move[1])
     end
-    remove_same_color(position, filtered_moves)
+    filtered_moves
   end
 
-  def remove_same_color(position, filtered_moves)
-    # removes from the possible moves array any cell that is occupied by a piece of the same color
-    unoccupied = []
-    filtered_moves.each do |move|
-      unoccupied << move if @board_cells[move[0]][move[1]] == ' '
-      next if @board_cells[move[0]][move[1]] == ' '
+  def remove_blocked_moves(possible_moves)
+    # removes passed moves that are blocked by the position of another piece
+    not_blocked = []
+    possible_moves.each do |direction|
+      direction.each do |move|
+        cell = @board_cells[move[0]][move[1]]
+        break if cell != ' ' || cell.color == @current_cell.color unless cell == ' '
 
-      unoccupied << move if @board_cells[move[0]][move[1]].color != @board_cells[position[0]][position[1]].color
+        not_blocked << move
+      end
     end
-    unoccupied
+    not_blocked
   end
 end

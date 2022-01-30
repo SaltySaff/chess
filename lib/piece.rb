@@ -15,9 +15,9 @@ class Piece
 
   def get_moveset(piece_type)
     movesets = {
-      'pawn' => [[1, 0]].freeze,
-      'knight' => [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]].freeze,
-      'king' => [[1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, -1], [1, 0]].freeze,
+      'pawn' => [[[1, 0]]].freeze,
+      'knight' => [[[1, 2]], [[2, 1]], [[2, -1]], [[1, -2]], [[-1, -2]], [[-2, -1]], [[-2, 1]], [[-1, 2]]].freeze,
+      'king' => [[[1, 1]], [[0, 1]], [[-1, 1]], [[-1, 0]], [[-1, -1]], [[0, -1]], [[1, -1]], [[1, -1]], [[1, 0]]].freeze,
       'rook' => generate_moveset([[0, 1], [-1, 0], [0, -1], [1, 0]]).freeze,
       'bishop' => generate_moveset([[1, 1], [-1, 1], [-1, -1], [1, -1]]).freeze,
       'queen' => generate_moveset([[1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, -1], [1, 0]]).freeze
@@ -29,11 +29,13 @@ class Piece
     generated_moveset = []
     count = 1
     move_array.each do |move|
+      direction = []
       count = 1
       7.times do
-        generated_moveset << [move[0] * count, move[1] * count]
+        direction << [move[0] * count, move[1] * count]
         count += 1
       end
+      generated_moveset << direction
     end
     generated_moveset
   end
