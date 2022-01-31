@@ -7,22 +7,47 @@ class Piece
   def initialize(piece_type, color, position)
     @piece_type = piece_type
     @color = color
-    @moveset = get_moveset(piece_type)
+    @first_move = true
+    @moveset = get_moveset(piece_type, color)
     @active = true
     @position = position
     @icon = get_icon(piece_type, color)
   end
 
-  def get_moveset(piece_type)
+  def get_moveset(piece_type, color = 'white')
     movesets = {
-      'pawn' => [[[1, 0]]].freeze,
+      'pawn' => { 'white' => [[[1, 0]]].freeze, 'black' => [[[-1, 0]]].freeze },
       'knight' => [[[1, 2]], [[2, 1]], [[2, -1]], [[1, -2]], [[-1, -2]], [[-2, -1]], [[-2, 1]], [[-1, 2]]].freeze,
       'king' => [[[1, 1]], [[0, 1]], [[-1, 1]], [[-1, 0]], [[-1, -1]], [[0, -1]], [[1, -1]], [[1, -1]], [[1, 0]]].freeze,
       'rook' => generate_moveset([[0, 1], [-1, 0], [0, -1], [1, 0]]).freeze,
       'bishop' => generate_moveset([[1, 1], [-1, 1], [-1, -1], [1, -1]]).freeze,
       'queen' => generate_moveset([[1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, -1], [1, 0]]).freeze
     }
-    movesets[piece_type]
+    return movesets[piece_type] if @piece_type != 'pawn'
+
+    pawn_first_move(movesets[piece_type][color])
+  end
+
+  def reset_pawn
+    case color
+    when 'white'
+      @moveset = pawn_first_move([[[1, 0]]]).freeze
+    when 'black'
+      @moveset = pawn_first_move([[[-1, 0]]]).freeze
+    end
+  end
+
+  def pawn_first_move(moveset)
+    if @first_move == true
+      case @color
+      when 'white'
+        moveset[0] << [2, 0]
+      when 'black'
+        moveset[0] << [-2, 0]
+      end
+      @first_move = false
+    end
+    moveset
   end
 
   def generate_moveset(move_array)

@@ -98,6 +98,7 @@ class Board
 
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
+    @current_cell.reset_pawn if @current_cell.piece_type == 'pawn'
   end
 
   def set_cells(start_pos, end_pos)
@@ -143,7 +144,7 @@ class Board
   end
 
   def filter_moves(possible_moves)
-    wremove_off_board(remove_blocked_moves(possible_moves))
+    remove_off_board(remove_blocked_moves(possible_moves))
   end
 
   def remove_off_board(possible_moves)
