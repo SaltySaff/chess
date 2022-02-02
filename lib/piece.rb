@@ -2,7 +2,8 @@
 
 # creates/controls chess pieces
 class Piece
-  attr_reader :piece_type, :moveset, :icon, :position, :color
+  attr_reader :piece_type, :icon, :color
+  attr_accessor :moveset, :position
 
   def initialize(piece_type, color, position)
     @piece_type = piece_type
@@ -29,7 +30,7 @@ class Piece
   end
 
   def reset_pawn
-    case color
+    case @color
     when 'white'
       @moveset = pawn_first_move([[[1, 0]]]).freeze
     when 'black'

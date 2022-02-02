@@ -2,7 +2,7 @@
 
 # creates/modifies game board and handles game logic
 class Board
-  attr_reader :inactive_pieces
+  attr_reader :inactive_pieces, :current_cell
 
   def initialize
     @board_cells = Array.new(8) { Array.new(8, ' ') }
@@ -59,6 +59,13 @@ class Board
     end
   end
 
+  def get_piece(position)
+    # returns the piece at the given position
+    return nil unless @board_cells[position[0]][position[1]]
+
+    @board_cells[position[0]][position[1]]
+  end
+
   def place_pieces
     # places each piece in its place on the board
     @active_pieces.each do |piece|
@@ -95,10 +102,10 @@ class Board
     return nil unless valid_move(start_pos, end_pos)
 
     capture_piece(end_pos) if occupied?(end_pos)
-
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
     @board_cells[start_pos[0]][start_pos[1]] = ' '
     @current_cell.reset_pawn if @current_cell.piece_type == 'pawn'
+    @current_cell.position = end_pos
   end
 
   def set_cells(start_pos, end_pos)
@@ -124,6 +131,7 @@ class Board
     # determines whether a given move is valid
     return nil if @current_cell == ' '
 
+    update_pawn_moveset(start_pos)
     possible_moves = calc_moves(start_pos)
     return true if possible_moves.include?(end_pos)
 
@@ -144,7 +152,43 @@ class Board
   end
 
   def filter_moves(possible_moves)
+    # filters possible moves to remove any impossible or illegal moves
+    return filter_knight(possible_moves) if @current_cell.piece_type == 'knight'
+
     remove_off_board(remove_blocked_moves(possible_moves))
+  end
+
+  def filter_knight(possible_moves)
+    # filters the passed knight moves, allowing the knight to jump over other pieces
+    filtered_moves = []
+    possible_moves.each do |direction|
+      direction.each do |move|
+        filtered_moves << move if (0..7).include?(move[0]) && (0..7).include?(move[1])
+      end
+    end
+    filtered_moves
+  end
+
+  def update_pawn_moveset(position)
+    # updates pawn's moveset if there are capturable pieces in range
+    diagonal_white = [[1, -1], [1, 1]]
+    diagonal_black = [[-1, -1], [-1, 1]]
+    case @current_cell.color
+    when 'white'
+      check_pawn_neighbours(diagonal_white, position)
+    when 'black'
+      check_pawn_neighbours(diagonal_black, position)
+    end
+  end
+
+  def check_pawn_neighbours(move_array, position)
+    # checks for capturable pieces for white pawns
+    move_array.each do |move|
+      cell = get_piece([position[0] + move[0], position[1] + move[1]])
+      next if cell.nil? || cell == ' '
+
+      @current_cell.moveset[0] << move if cell.color != @current_cell.color
+    end
   end
 
   def remove_off_board(possible_moves)
@@ -162,11 +206,22 @@ class Board
     possible_moves.each do |direction|
       direction.each do |move|
         cell = @board_cells[move[0]][move[1]]
-        break if cell != ' ' || cell.color == @current_cell.color unless cell == ' '
+        break if cell.color == @current_cell.color || illegal_capture(move, cell) unless cell == ' '
 
         not_blocked << move
       end
     end
     not_blocked
+  end
+
+  def illegal_capture(move, target_cell)
+    # stops pawns from capturing any pieces in front of them
+    return false if target_cell == ' ' || @current_cell.piece_type != 'pawn'
+
+    piece_moveset = @current_cell.moveset[0][0]
+    move_taken = [move[0] - piece_moveset[0], move[1] - piece_moveset[1]]
+    return true if move_taken == @current_cell.position
+
+    false
   end
 end
