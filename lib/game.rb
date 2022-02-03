@@ -5,6 +5,7 @@ class Game
     @board = Board.new
     @player_one = nil
     @player_two = nil
+    @player_turn = nil
   end
 
   def play_game
@@ -26,10 +27,10 @@ class Game
   end
 
   def create_players
-    puts 'Player 1, please enter your name:'
+    puts 'Player 1, please enter your name:'.cyan
     choice = gets.chomp
     @player_one = Player.new(choice)
-    puts 'Player 2, please enter your name:'
+    puts 'Player 2, please enter your name:'.cyan
     choice = gets.chomp
     @player_two = Player.new(choice)
   end
@@ -63,8 +64,8 @@ class Game
 
   def player_choice
     puts 'Who wants to go first?'.green
-    puts " #{'1.'.blue} #{'Red'.red}"
-    puts " #{'2.'.blue} #{'Yellow'.yellow}"
+    puts " #{'1.'.blue} #{@player_one.name.red}"
+    puts " #{'2.'.blue} #{@player_two.name.yellow}"
     puts " #{'3.'.blue} #{'Choose for us!'.cyan}"
     player_input(1, 3)
   end
@@ -72,11 +73,21 @@ class Game
   def change_player_turn(choice)
     case choice
     when 1
-      @player_turn = 'red'
+      @player_turn = @player_one
     when 2
-      @player_turn = 'yellow'
+      @player_turn = @player_two
     when 3
       @player_turn = random_choice
+    end
+  end
+
+  def random_choice
+    random_number = rand(1..2)
+    case random_number
+    when 1
+      @player_one
+    when 2
+      @player_two
     end
   end
 end
