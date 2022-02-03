@@ -27,12 +27,40 @@ class Game
   end
 
   def create_players
+    clear
     puts 'Player 1, please enter your name:'.cyan
     choice = gets.chomp
     @player_one = Player.new(choice)
     puts 'Player 2, please enter your name:'.cyan
     choice = gets.chomp
     @player_two = Player.new(choice)
+    choose_color(@player_one)
+    clear
+  end
+
+  def choose_color(player)
+    clear
+    puts "What color would you like to be #{player.name}?".cyan
+    puts " #{'1.'.blue} #{'White'.white}"
+    puts " #{'2.'.blue} #{'Black'.magenta}"
+    choice = player_input(1, 2)
+    change_color(choice)
+    clear_delay
+  end
+
+  def change_color(choice)
+    case choice
+    when 1
+      @player_one.color_choice = 'white'
+      @player_two.color_choice = 'black'
+      puts "#{@player_one.name} is white.".white
+      puts "#{@player_two.name} is black.".magenta
+    when 2
+      @player_one.color_choice = 'black'
+      @player_two.color_choice = 'white'
+      puts "#{@player_one.name} is black.".white
+      puts "#{@player_two.name} is white.".magenta
+    end
   end
 
   def player_input(min, max)
@@ -53,8 +81,8 @@ class Game
     create_players
     choice = player_choice
     change_player_turn(choice)
-    place_piece while @board.board_full? == false
-    drawer
+    clear
+    place_piece
   end
 
   def load_game
@@ -89,5 +117,24 @@ class Game
     when 2
       @player_two
     end
+  end
+
+  def place_piece
+    @board.display
+    puts "#{'It\'s'.green} #{@player_turn.name.colorize(@player_turn.name.to_sym)}#{'\'s turn to place a piece'.green}"
+    puts 'Please choose a column to place your piece in.'.cyan
+    choice = validate_placement(player_input(1, 7))
+    @board.add(@player_turn, choice)
+    check_for_victory(@player_turn, choice)
+    switch_turn
+  end
+
+  def clear
+    system 'clear'
+  end
+
+  def clear_delay
+    sleep(1)
+    system 'clear'
   end
 end
