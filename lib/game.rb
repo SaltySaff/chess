@@ -31,6 +31,7 @@ class Game
     puts 'Player 1, please enter your name:'.cyan
     choice = gets.chomp
     @player_one = Player.new(choice)
+    clear
     puts 'Player 2, please enter your name:'.cyan
     choice = gets.chomp
     @player_two = Player.new(choice)
@@ -44,8 +45,8 @@ class Game
     puts " #{'1.'.blue} #{'White'.white}"
     puts " #{'2.'.blue} #{'Black'.magenta}"
     choice = player_input(1, 2)
+    clear
     change_color(choice)
-    clear_delay
   end
 
   def change_color(choice)
@@ -61,6 +62,7 @@ class Game
       puts "#{@player_one.name} is black.".magenta
       puts "#{@player_two.name} is white.".white
     end
+    clear_delay(1.5)
   end
 
   def player_input(min, max)
@@ -69,12 +71,26 @@ class Game
       verified_number = verify_input(min, max, user_input.to_i) if user_input.match?(/^\d$/)
       return verified_number if verified_number
 
-      puts "Input error! Please enter a number between #{min} and #{max}."
+      puts "Input error! Please enter a number between #{min} and #{max}.".red
     end
   end
 
   def verify_input(min, max, input)
     return input if input.between?(min, max)
+  end
+
+  def player_input_letter(min, max)
+    loop do
+      user_input = gets.chomp.downcase
+      verified_letter = verify_letter(user_input, min, max) if user_input.match?(/^[a-z]$/)
+      return verified_letter if verified_letter
+
+      puts "Input error! Please enter a number between #{min} and #{max}.".red
+    end
+  end
+
+  def verify_letter(letter, min_letter, max_letter)
+    return letter if (min_letter..max_letter).include?(letter)
   end
 
   def new_game
@@ -126,21 +142,61 @@ class Game
   end
 
   def place_piece
-    @board.display
-    puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
-    puts 'Please choose a column to place your piece in.'.cyan
-    choice = validate_placement(player_input(1, 7))
-    @board.add(@player_turn, choice)
-    check_for_victory(@player_turn, choice)
-    switch_turn
+    until @board.checkmate? == true
+      @board.display
+      puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
+      @board.move_piece(choose_piece, choose_destination)
+      switch_turn
+    end
+    puts "Checkmate! #{player_turn} wins!"
+  end
+
+  def switch_turn
+    @player_turn == @player_one ? @player_two : @player_one
+  end
+
+  def choose_piece
+    clear_with_board(2)
+    puts 'First we\'ll choose a piece...'.green
+    clear_with_board(2)
+    coords
+  end
+
+  def choose_destination
+    clear_with_board(2)
+    puts 'Where would you like to move the piece to?'.green
+    clear_with_board(2)
+    coords
+  end
+
+
+  def letter_to_number(letter)
+    # converts input letter to appropriate index number
+    letter_to_number = ('a'..'h').zip(0..7).to_h
+    letter_to_number[letter]
+  end
+
+  def coords
+    puts 'Please enter a column letter:'.green
+    x_axis = letter_to_number(player_input_letter('a', 'h'))
+    puts 'Please enter a row number:'.green
+    y_axis = player_input(1, 8) - 1
+    p [y_axis, x_axis]
   end
 
   def clear
     system 'clear'
   end
 
-  def clear_delay
-    sleep(1)
+  def clear_delay(delay)
+    sleep(delay)
     system 'clear'
+  end
+
+  def clear_with_board(delay = 0)
+    # clears the screen without removing the board
+    sleep(delay)
+    system 'clear'
+    @board.display
   end
 end

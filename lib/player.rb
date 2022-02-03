@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# stores attributes for each player
 class Player
   attr_accessor :name, :color_choice
 

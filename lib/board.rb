@@ -2,7 +2,7 @@
 
 # creates/modifies game board and handles game logic
 class Board
-  attr_reader :inactive_pieces, :current_cell
+  attr_reader :inactive_pieces, :current_cell, :check_counter
 
   def initialize
     @board_cells = Array.new(8) { Array.new(8, ' ') }
@@ -145,6 +145,7 @@ class Board
       piece = get_piece(move)
       if piece.piece_type == 'king' && piece.color != current_cell.color
         @check_counter += 1
+        puts 'Check!'.green
         return true
       end
     end
