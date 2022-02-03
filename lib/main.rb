@@ -7,5 +7,7 @@ require_relative '../lib/game'
 require_relative '../lib/piece'
 require_relative '../lib/player'
 
-game = Game.new
-game.play_game
+# game = Game.new
+# game.play_game
+board = Board.new
+board.display

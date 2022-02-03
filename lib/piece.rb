@@ -68,12 +68,12 @@ class Piece
 
   def get_icon(piece_type, color)
     icons = {
-      'pawn' => { 'black' => "\u{2659}", 'white' => "\u{265F}" },
-      'knight' => { 'black' => "\u{2658}", 'white' => "\u{265E}" },
-      'king' => { 'black' => "\u{2654}", 'white' => "\u{265A}" },
-      'rook' => { 'black' => "\u{2656}", 'white' => "\u{265C}" },
-      'bishop' => { 'black' => "\u{2657}", 'white' => "\u{265D}" },
-      'queen' => { 'black' => "\u{2655}", 'white' => "\u{265B}" }
+      'pawn' => { 'black' => "\u{2659}".magenta, 'white' => "\u{265F}" },
+      'knight' => { 'black' => "\u{2658}".magenta, 'white' => "\u{265E}" },
+      'king' => { 'black' => "\u{2654}".magenta, 'white' => "\u{265A}" },
+      'rook' => { 'black' => "\u{2656}".magenta, 'white' => "\u{265C}" },
+      'bishop' => { 'black' => "\u{2657}".magenta, 'white' => "\u{265D}" },
+      'queen' => { 'black' => "\u{2655}".magenta, 'white' => "\u{265B}" }
     }
     icons[piece_type][color]
   end

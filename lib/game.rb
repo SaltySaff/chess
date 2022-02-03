@@ -58,8 +58,8 @@ class Game
     when 2
       @player_one.color_choice = 'black'
       @player_two.color_choice = 'white'
-      puts "#{@player_one.name} is black.".white
-      puts "#{@player_two.name} is white.".magenta
+      puts "#{@player_one.name} is black.".magenta
+      puts "#{@player_two.name} is white.".white
     end
   end
 
@@ -92,10 +92,16 @@ class Game
 
   def player_choice
     puts 'Who wants to go first?'.green
-    puts " #{'1.'.blue} #{@player_one.name.red}"
-    puts " #{'2.'.blue} #{@player_two.name.yellow}"
+    puts " #{'1.'.blue} #{display_player_color(@player_one)}"
+    puts " #{'2.'.blue} #{display_player_color(@player_two)}"
     puts " #{'3.'.blue} #{'Choose for us!'.cyan}"
     player_input(1, 3)
+  end
+
+  def display_player_color(player)
+    return player.name.magenta if player.color_choice == 'black'
+
+    player.name.white
   end
 
   def change_player_turn(choice)
@@ -121,7 +127,7 @@ class Game
 
   def place_piece
     @board.display
-    puts "#{'It\'s'.green} #{@player_turn.name.colorize(@player_turn.name.to_sym)}#{'\'s turn to place a piece'.green}"
+    puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
     puts 'Please choose a column to place your piece in.'.cyan
     choice = validate_placement(player_input(1, 7))
     @board.add(@player_turn, choice)
