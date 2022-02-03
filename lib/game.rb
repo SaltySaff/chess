@@ -85,7 +85,7 @@ class Game
       verified_letter = verify_letter(user_input, min, max) if user_input.match?(/^[a-z]$/)
       return verified_letter if verified_letter
 
-      puts "Input error! Please enter a number between #{min} and #{max}.".red
+      puts "Input error! Please enter a letter between '#{min}' and '#{max}'.".red
     end
   end
 
@@ -98,7 +98,7 @@ class Game
     choice = player_choice
     change_player_turn(choice)
     clear
-    place_piece
+    prompt_placement
   end
 
   def load_game
@@ -141,18 +141,56 @@ class Game
     end
   end
 
-  def place_piece
+  def prompt_placement
     until @board.checkmate? == true
-      @board.display
+      clear_with_board
       puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
-      @board.move_piece(choose_piece, choose_destination)
+      place_piece
       switch_turn
     end
     puts "Checkmate! #{player_turn} wins!"
   end
 
+  def place_piece
+    piece = validate_choice(choose_piece)
+    destination = validate_destination(choose_destination, piece)
+    @board.move_piece(piece, destination)
+  end
+
+  def validate_choice(piece)
+    return empty_tile if @board.get_piece(piece) == ' '
+
+    return wrong_color if @board.get_piece(piece).color != @player_turn.color_choice
+
+    piece
+  end
+
+  def validate_destination(destination, piece)
+    return placement_error if @board.move_piece(piece, destination).nil?
+
+    destination
+  end
+
+  def empty_tile
+    puts 'Oops! There isn\'t one of your pieces there!'.red
+    clear_with_board(2)
+    place_piece
+  end
+
+  def placement_error
+    puts 'Oops! You can\'t place that piece there. Please choose another tile.'.red
+    clear_with_board(2)
+    place_piece
+  end
+
+  def wrong_color
+    puts 'Oops! That piece doesn\'t belong to you!'.red
+    clear_with_board(2)
+    place_piece
+  end
+
   def switch_turn
-    @player_turn == @player_one ? @player_two : @player_one
+    @player_turn = @player_turn == @player_one ? @player_two : @player_one
   end
 
   def choose_piece
@@ -163,12 +201,19 @@ class Game
   end
 
   def choose_destination
-    clear_with_board(2)
     puts 'Where would you like to move the piece to?'.green
     clear_with_board(2)
     coords
   end
 
+  def validate_move(start_coords, end_coords)
+    loop do
+      verified_number = verify_input(min, max, user_input.to_i) if user_input.match?(/^\d$/)
+      return verified_number if verified_number
+
+      puts "Input error! Please enter a number between #{min} and #{max}.".red
+    end
+  end
 
   def letter_to_number(letter)
     # converts input letter to appropriate index number
@@ -181,7 +226,8 @@ class Game
     x_axis = letter_to_number(player_input_letter('a', 'h'))
     puts 'Please enter a row number:'.green
     y_axis = player_input(1, 8) - 1
-    p [y_axis, x_axis]
+    clear_with_board
+    [y_axis, x_axis]
   end
 
   def clear

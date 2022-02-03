@@ -12,6 +12,7 @@ class Board
     @goal_cell = nil
     generate_pieces
     @check_counter = 0
+    @possible_moves
   end
 
   def display
@@ -133,9 +134,15 @@ class Board
     return nil if @current_cell == ' '
 
     update_pawn_moveset(start_pos)
-    possible_moves = calc_moves(start_pos)
-    check?(possible_moves)
-    return true if possible_moves.include?(end_pos)
+    @possible_moves = calc_moves(start_pos)
+    check?(@possible_moves)
+    return true if @possible_moves.include?(end_pos)
+
+    false
+  end
+
+  def no_possible_moves
+    return true if @possible_moves.empty?
 
     false
   end
@@ -143,6 +150,8 @@ class Board
   def check?(moves_array)
     moves_array.each do |move|
       piece = get_piece(move)
+      next if piece == ' '
+
       if piece.piece_type == 'king' && piece.color != current_cell.color
         @check_counter += 1
         puts 'Check!'.green
