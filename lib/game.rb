@@ -19,6 +19,41 @@ class Game
     end
   end
 
+  def save_game
+    game_state = YAML.dump({
+      board: @board,
+      player_one: @player_one,
+      player_two: @player_two,
+      player_turn: @player_turn
+    })
+    File.open('./chess.yml', 'w') { |f| f.write game_state }
+    exit
+  end
+
+  def load_game
+    yaml = YAML.load_file('./chess.yml')
+    deserialize(yaml)
+    prompt_placement
+  end
+
+  def deserialize(file)
+    @board = file[:board]
+    @player_one = file[:player_one]
+    @player_two = file[:player_two]
+    @player_turn = file[:player_turn]
+  end
+
+  def continue_or_save
+    puts 'Would you like to continue or save?'.green
+    puts " #{'1.'.blue} #{'Continue'.cyan}"
+    puts " #{'2.'.blue} #{'Save'.cyan}"
+    answer = player_input(1, 2)
+    case answer
+    when 1 then prompt_placement
+    when 2 then save_game
+    end
+  end
+
   def greeting
     clear
     puts 'Welcome to Chess!'.green
@@ -102,11 +137,6 @@ class Game
     prompt_placement
   end
 
-  def load_game
-    puts 'This feature is not yet implemented.'.green
-    play_again
-  end
-
   def player_choice
     puts 'Who wants to go first?'.green
     puts " #{'1.'.blue} #{display_player_color(@player_one)}"
@@ -148,6 +178,8 @@ class Game
       puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
       place_piece
       switch_turn
+      clear_with_board
+      continue_or_save
     end
     clear_with_board
     puts 'Checkmate!'.yellow
