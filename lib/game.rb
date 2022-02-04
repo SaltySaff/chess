@@ -20,6 +20,7 @@ class Game
   end
 
   def greeting
+    clear
     puts 'Welcome to Chess!'.green
     puts " #{'1.'.blue} #{'New Game'.cyan}"
     puts " #{'2.'.blue} #{'Load Game'.cyan}"
@@ -103,7 +104,7 @@ class Game
 
   def load_game
     puts 'This feature is not yet implemented.'.green
-    play_again?
+    play_again
   end
 
   def player_choice
@@ -142,13 +143,28 @@ class Game
   end
 
   def prompt_placement
-    until @board.checkmate? == true
+    until @board.check_counter == 2
       clear_with_board
       puts "#{'It\'s'.green} #{display_player_color(@player_turn)}#{'\'s turn to place a piece'.green}"
       place_piece
       switch_turn
     end
-    puts "Checkmate! #{player_turn} wins!"
+    clear_with_board
+    puts 'Checkmate!'.yellow
+    play_again
+  end
+
+  def play_again
+    puts 'Would you like to play again?'.blue
+    puts " #{'1.'.blue} #{'Play again'.cyan}"
+    puts " #{'2.'.blue} #{'Return to the main menu'.cyan}"
+    choice = player_input(1, 2)
+    case choice
+    when 1
+      new_game
+    when 2
+      play_game
+    end
   end
 
   def place_piece
@@ -166,7 +182,7 @@ class Game
   end
 
   def validate_destination(destination, piece)
-    return placement_error if @board.move_piece(piece, destination).nil?
+    return placement_error if @board.move_piece(piece, destination) == false
 
     destination
   end
@@ -244,6 +260,11 @@ class Game
     sleep(delay)
     system 'clear'
     @board.display
-    puts 'Check' if @board.check_counter == 1
+    puts 'Check!'.yellow if @board.check_counter == 1
+  end
+
+  def setup
+    @board = CFBoard.new
+    @player_turn = nil
   end
 end

@@ -100,7 +100,7 @@ class Board
   def move_piece(start_pos, end_pos)
     # moves a piece from one board cell to another
     set_cell(start_pos)
-    return nil unless valid_move(start_pos, end_pos)
+    return false unless valid_move(start_pos, end_pos)
 
     capture_piece(end_pos) if occupied?(end_pos)
     @board_cells[end_pos[0]][end_pos[1]] = @board_cells[start_pos[0]][start_pos[1]]
@@ -164,10 +164,6 @@ class Board
       return true if piece.piece_type == 'king' && piece.color != @current_cell.color unless piece == ' '
     end
     false
-  end
-
-  def checkmate?
-    return true if @check_counter == 2
   end
 
   def calc_moves(position)
