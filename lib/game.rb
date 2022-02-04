@@ -244,5 +244,6 @@ class Game
     sleep(delay)
     system 'clear'
     @board.display
+    puts 'Check' if @board.check_counter == 1
   end
 end
